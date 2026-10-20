@@ -1091,7 +1091,7 @@ function bakeHeatmaps() {
         }
       }
 
-      // In Fog of War, render Task 2's deceptive basin centered at (12.2, 18.5) with rich teal/green slopes
+      // In Fog, render Task 2's deceptive basin centered at (12.2, 18.5) with rich teal/green slopes
       const t2Norm = lossToNorm(l2);
       let [r2, g2, b2] = colorMapViridis(t2Norm);
       const l2Right = task2Loss(uRight, v);
@@ -1349,12 +1349,12 @@ function updateColorbarPointer(l1, l2, isFog) {
   const status = document.getElementById('colorbarStatusText');
 
   if (isFog) {
-    // During Fog of War, track θ along the visible Task 2 surface L2(θ) on the colorbar
+    // During Fog, track θ along the visible Task 2 surface L2(θ) on the colorbar
     titleEl.innerHTML = 'Visible Surface: Task 2 Loss <em>L</em><sub>2</sub>(θ) &nbsp;(Task 1 <em>L</em><sub>1</sub> Hidden)';
     const pct2 = Math.max(2, Math.min(98, lossToNorm(l2) * 100));
     ptr.style.left = `${pct2.toFixed(1)}%`;
     lbl.textContent = `θ: L₂=${l2.toFixed(1)}`;
-    status.textContent = 'Fog of War: Task 1 Curvature Unobserved';
+    status.textContent = 'Fog Introduced: Task 1 Curvature Unobserved';
     status.style.color = '#b45309';
     return;
   }
