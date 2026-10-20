@@ -25,6 +25,10 @@
       --rule-heavy: #0f172a;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+    }
     body {
       font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
@@ -110,9 +114,11 @@
 
     .container {
       max-width: 1120px;
+      width: 100%;
       margin: 0 auto;
       padding: 28px 16px;
       display: grid;
+      grid-template-columns: minmax(0, 1fr);
       gap: 32px;
     }
     .card {
@@ -120,7 +126,12 @@
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 28px;
+      min-width: 0;
       box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    }
+    @media (max-width: 640px) {
+      header { padding: 28px 16px 24px; }
+      .card { padding: 18px 14px; }
     }
     .section-header {
       display: flex;
@@ -180,13 +191,14 @@
     }
     @media (max-width: 820px) {
       .instruction-header {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
     }
     .instruction-steps {
       display: flex;
       flex-direction: column;
       gap: 4px;
+      min-width: 0;
     }
     .instruction-kicker {
       display: flex;
@@ -215,12 +227,12 @@
 
     .game-layout {
       display: grid;
-      grid-template-columns: 1fr 340px;
+      grid-template-columns: minmax(0, 1fr) 340px;
       gap: 24px;
       align-items: start;
     }
     @media (max-width: 920px) {
-      .game-layout { grid-template-columns: 1fr; }
+      .game-layout { grid-template-columns: minmax(0, 1fr); }
     }
 
     /* Stage Column */
@@ -228,6 +240,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      min-width: 0;
     }
     .canvas-wrap {
       position: relative;
@@ -257,6 +270,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
       margin-bottom: 18px;
       font-size: 0.76rem;
       font-weight: 600;
@@ -364,6 +379,7 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
+      min-width: 0;
     }
     .btn {
       background: var(--primary);
@@ -382,6 +398,7 @@
       align-items: center;
       gap: 6px;
       white-space: nowrap;
+      max-width: 100%;
     }
     .btn:hover { background: #0c3b66; }
     .btn-secondary {
@@ -523,6 +540,176 @@
       gap: 10px;
       margin-top: 14px;
     }
+
+    /* Native Mobile Phone Experience (<= 640px) — Desktop structure (> 640px) remains untouched */
+    @media (max-width: 640px) {
+      body {
+        padding-bottom: 48px;
+      }
+      header {
+        padding: 22px 14px 20px;
+      }
+      .header-inner {
+        gap: 12px;
+      }
+      .venue-tag {
+        font-size: 0.68rem;
+        line-height: 1.35;
+        letter-spacing: 0.05em;
+      }
+      h1 {
+        font-size: 1.32rem;
+        line-height: 1.28;
+      }
+      h1 br {
+        display: none;
+      }
+      .authors {
+        width: 100%;
+      }
+      .authors .btn {
+        width: 100%;
+        padding: 11px 14px !important;
+        font-size: 0.92rem !important;
+        border-radius: 6px !important;
+      }
+      .affiliation {
+        font-size: 0.92rem !important;
+        line-height: 1.35;
+      }
+      .equation-banner {
+        width: 100%;
+        flex-direction: column;
+        gap: 6px;
+        padding: 10px 12px;
+        font-size: 0.84rem;
+      }
+      .equation-banner .metrics {
+        border-left: none;
+        border-top: 1px solid var(--border);
+        padding-left: 0;
+        padding-top: 6px;
+        width: 100%;
+        font-size: 0.74rem;
+      }
+
+      /* Maximize card & canvas width on phone screens */
+      .container {
+        padding: 12px 8px;
+        gap: 16px;
+      }
+      .card {
+        padding: 16px 12px;
+        border-radius: 10px;
+      }
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+      }
+      .section-header h2 {
+        font-size: 1.08rem;
+        line-height: 1.3;
+      }
+      .section-meta {
+        font-size: 0.73rem;
+      }
+
+      /* Compact instruction banner + full-width thumb-friendly action buttons */
+      .instruction-header {
+        padding: 12px;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+      .instruction-text {
+        font-size: 0.84rem;
+      }
+      .instruction-sub {
+        font-size: 0.75rem;
+        line-height: 1.4;
+      }
+      .instruction-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        gap: 8px;
+      }
+      .instruction-actions .btn {
+        width: 100%;
+        min-height: 42px;
+        padding: 8px 10px;
+        font-size: 0.78rem;
+        white-space: normal;
+        line-height: 1.2;
+      }
+
+      /* Give interactive canvases a taller touch-friendly aspect ratio on phones */
+      .canvas-wrap {
+        aspect-ratio: 4 / 3 !important;
+      }
+
+      /* Prevent colorbar tick labels from colliding on narrow mobile screens */
+      .colorbar-card {
+        padding: 10px 10px 14px;
+      }
+      .colorbar-header {
+        font-size: 0.71rem;
+        margin-bottom: 16px;
+      }
+      .colorbar-track-wrap {
+        margin: 0 4px;
+      }
+      .bar-markers {
+        height: 48px;
+      }
+      .tick-val {
+        font-size: 0.64rem;
+      }
+      .tick-desc {
+        font-size: 0.6rem;
+        white-space: normal;
+        max-width: 72px;
+        line-height: 1.15;
+      }
+
+      /* Touch-friendly sliders, 3x2 method selector grid, and compact table */
+      input[type="range"] {
+        height: 28px;
+      }
+      .telemetry-cell {
+        padding: 6px 8px;
+      }
+      .telemetry-val {
+        font-size: 0.82rem;
+      }
+      .method-tabs {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+      }
+      .tab-btn {
+        padding: 9px 6px;
+        font-size: 0.75rem;
+        text-align: center;
+      }
+      .booktabs-table {
+        font-size: 0.73rem;
+      }
+      .booktabs-table thead th,
+      .booktabs-table tbody td {
+        padding: 6px 4px;
+      }
+      pre {
+        padding: 12px;
+        font-size: 0.72rem;
+      }
+      .footer-links .btn {
+        width: 100%;
+        min-height: 44px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -532,7 +719,7 @@
     <div class="venue-tag">NeurIPS 2026 Workshop • Continual Learning in the Era of Foundation Models and Embodied Agents</div>
     <h1>Trajectory-Modulated Landscape Navigation (TMLN)<br/>Decoupling Stability from Rigidity in Continual Learning</h1>
     <div class="authors">
-       <a class="btn btn-lg" href="mailto:isabelle.aguilar@sydney.edu.au" style="background-color: #10b981; color: white; padding: 14px 30px; font-size: 1.25rem; font-weight: 700; border-radius: 4px; text-decoration: none;">EMAIL: isabelle.aguilar@sydney.edu.au</a>
+       <a class="btn btn-lg" href="mailto:isabelle.aguilar@sydney.edu.au" style="background-color: #10b981; border-color: #10b981; color: white; padding: 12px 24px; font-size: clamp(0.95rem, 3.8vw, 1.25rem); font-weight: 700; border-radius: 4px; text-decoration: none; white-space: normal; word-break: break-word;">EMAIL: isabelle.aguilar@sydney.edu.au</a>
     </div>
     <div class="affiliation" style="font-size: 1.2rem; font-weight: 700">School of Biomedical Engineering, The University of Sydney</div>
     <div class="equation-banner">
@@ -545,10 +732,19 @@
 <div class="container">
 
   <!-- SECTION I: LOSS LANDSCAPE NAVIGATION -->
-  <div class="card">
+<!--  <div class="card">-->
+<!--    <div class="section-header">-->
+<!--      <h2><span class="section-num">I.</span> INTERACTIVE FIGURE 2: Loss Landscape Navigation Under "Fog"</h2>-->
+<!--      <span class="section-meta">Parameter Subspace Projection (u, v)</span>-->
+<!--    </div>-->
+    <div class="card">
     <div class="section-header">
-      <h2><span class="section-num">I.</span> INTERACTIVE FIGURE 2: Loss Landscape Navigation Under "Fog"</h2>
-      <span class="section-meta">Parameter Subspace Projection (u, v)</span>
+    <h2><span class="section-num">I.</span> INTERACTIVE FIGURE 2: Loss Landscape Navigation Under "Fog"</h2>
+    <span class="section-meta">Parameter Subspace Projection (u, v)</span>
+    </div>
+
+    <div style="background-color: #f8f9fa; padding: 12px 16px; margin-bottom: 16px; border-left: 4px solid #6d28d9; font-weight: 500;">
+    <strong>OBJECTIVE</strong>: Navigate to Task 1 and Task 2 minimums successfully on the loss landscape.
     </div>
 
     <!-- Prominent, High-Visibility Instruction & Control Bar at Top of Figure -->
@@ -556,10 +752,10 @@
       <div class="instruction-steps">
         <div class="instruction-kicker" id="instructionKicker">Interactive Experiment • Two-Stage Sequential Training</div>
         <div class="instruction-text" id="phaseBanner">
-          <strong>How to use:</strong> Click <strong>"START"</strong>, then drag the blue parameter marker <strong>θ</strong> on the plot (or use arrow keys).
+          <strong>HOW TO USE:</strong> Click <strong>"START"</strong>, then drag the blue parameter marker <strong>θ</strong> on the plot (or use arrow keys).
         </div>
         <div class="instruction-sub" id="instructionSub">
-          <strong>Stage 1 (6s):</strong> Converge to Task 1 minimum θ₁ (0, 0). &nbsp;|&nbsp;
+          <strong>Stage 1 (6s):</strong> Converge to Task 1 minimum θ₁. <br>
           <strong>Stage 2 (8s in "Task 1 Fog"):</strong> Task 1 contours have disappeared! Navigate towards Task 2 min without drifting onto Task 1's yellow high-forgetting cliff.
         </div>
       </div>
@@ -963,12 +1159,12 @@ function setInstructionState(mode, evalSummary = null) {
   if (mode === 'TASK1') {
     header.classList.add('state-task1');
     kicker.textContent = 'STAGE 1 • Task 1 Training';
-    banner.innerHTML = '<strong>INSTRUCTIONS:</strong> Drag the blue marker <strong>θ</strong> from (-10, 0) into the white Task 1 minimum <strong>θ₁ (0, 0)</strong>.';
+    banner.innerHTML = '<strong>INSTRUCTIONS: Drag the blue marker θ from (-10, 0) into the white Task 1 minimum θ₁ (0, 0)</strong>.';
     // sub.textContent = 'Notice where Task 1\'s dark-purple low-forgetting valley curves upward (around u ≈ 3.5)—you will need to remember this path in Stage 2!';
   } else if (mode === 'TASK2') {
     header.classList.add('state-fog');
     kicker.textContent = 'STAGE 2 • Task 2 Training';
-    banner.innerHTML = '<strong>INSTRUCTIONS:</strong> Task 1 is now hidden! Reach an optimal point to reduce Task 2 loss without forgetting Task 1.';
+    banner.innerHTML = '<strong>INSTRUCTIONS: Task 1 is now hidden! Reach an optimal point to reduce Task 2 loss without forgetting Task 1.</strong>';
     // sub.textContent = 'Trap Warning: Unconstrained gradient descent follows the green/teal slope straight into θ₂ (12.2, 18.5), unaware that it sits on Task 1\'s yellow cliff.';
   } else if (mode === 'REVEAL') {
     header.classList.add('state-reveal');
@@ -1226,7 +1422,7 @@ function gameLoop(now) {
         verdictText = 'Catastrophic Forgetting';
         evalSummary = {
           banner: `<strong style="color:#b91c1c;">Catastrophic Forgetting Trap Triggered (L₁ = ${l1.toFixed(2)}, L₂ = ${l2.toFixed(2)}):</strong><br> Following Task 2's basin toward θ₂ pulled your parameters onto Task 1's steep cliff!`,
-          sub: 'Without historical trajectory preconditioning (γS̄), gradient descent is blind to Task 1\'s cliff walls during Task 2 optimization.'
+          // sub: 'Without historical trajectory preconditioning (γS̄), gradient descent is blind to Task 1\'s cliff walls during Task 2 optimization.'
         };
       } else if (playerUV[1] < 12.0) {
         verdictText = 'High Intransigence';
