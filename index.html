@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Trajectory-Modulated Landscape Navigation (TMLN) | NeurIPS 2026 Interactive Companion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --surface: #ffffff;
+      --surface-subtle: #f1f5f9;
+      --border: #cbd5e1;
+      --border-light: #e2e8f0;
+      --ink: #0f172a;
+      --ink-secondary: #334155;
+      --muted: #64748b;
+      --primary: #0f4c81;
+      --primary-light: #eff6ff;
+      --accent: #0d9488;
+      --danger: #b91c1c;
+      --warn: #b45309;
+      --rule-heavy: #0f172a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      padding-bottom: 80px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Scholarly Header */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 40px 24px 32px;
+    }
+    .header-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .venue-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 3px;
+      margin: 0;
+    }
+    h1 {
+      font-family: "Source Serif 4", Georgia, Cambria, serif;
+      font-size: clamp(1.6rem, 3.1vw, 2.25rem);
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      line-height: 1.25;
+      max-width: 880px;
+      margin: 0 auto;
+    }
+    .authors {
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: 1.02rem;
+      color: var(--ink-secondary);
+      margin: 0;
+    }
+    .affiliation {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin: 0;
+    }
+    .equation-banner {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      padding: 9px 20px;
+      border-radius: 6px;
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: 0.95rem;
+      color: var(--ink);
+    }
+    .equation-banner .math {
+      font-style: italic;
+      font-weight: 600;
+    }
+    .equation-banner .metrics {
+      font-family: "Inter", sans-serif;
+      font-size: 0.79rem;
+      font-weight: 600;
+      color: var(--primary);
+      border-left: 1px solid var(--border);
+      padding-left: 16px;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 28px 16px;
+      display: grid;
+      gap: 32px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 28px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .section-header h2 {
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .section-num {
+      color: var(--primary);
+      font-weight: 700;
+      margin-right: 6px;
+    }
+    .section-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* Prominent Top Instruction & Action Callout Banner */
+    .instruction-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 20px;
+      background: #f0f7ff;
+      border: 1px solid #bfdbfe;
+      border-left: 4px solid var(--primary);
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      transition: all 0.2s ease;
+    }
+    .instruction-header.state-task1 {
+      background: #eff6ff;
+      border-color: #93c5fd;
+      border-left-color: #2563eb;
+    }
+    .instruction-header.state-fog {
+      background: #fffbeb;
+      border-color: #fde68a;
+      border-left-color: #d97706;
+    }
+    .instruction-header.state-reveal {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+      border-left-color: #059669;
+    }
+    @media (max-width: 820px) {
+      .instruction-header {
+        grid-template-columns: 1fr;
+      }
+    }
+    .instruction-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .instruction-kicker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--primary);
+    }
+    .instruction-text {
+      font-size: 0.9rem;
+      color: var(--ink);
+      line-height: 1.45;
+    }
+    .instruction-sub {
+      font-size: 0.79rem;
+      color: var(--ink-secondary);
+    }
+    .instruction-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .game-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 920px) {
+      .game-layout { grid-template-columns: 1fr; }
+    }
+
+    /* Stage Column */
+    .stage-column {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .canvas-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 11;
+      background: #ffffff;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      touch-action: none;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+
+    /* Clean Colorbar with Markers Positioned Directly Along the Bar */
+    .colorbar-card {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 18px 14px;
+    }
+    .colorbar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--ink-secondary);
+    }
+    .colorbar-track-wrap {
+      position: relative;
+      margin: 0 10px;
+    }
+    .viridis-bar {
+      width: 100%;
+      height: 14px;
+      border-radius: 3px;
+      background: linear-gradient(90deg,
+        #440154 0%,
+        #3b528b 20%,
+        #21918c 40%,
+        #2ab07f 60%,
+        #7ad151 80%,
+        #fde725 100%
+      );
+      border: 1px solid rgba(15, 23, 42, 0.35);
+    }
+    /* Dynamic Live Pointer on the Colorbar */
+    .live-bar-pointer {
+      position: absolute;
+      top: -15px;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: left 0.06s linear;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .live-bar-pointer span {
+      background: var(--ink);
+      color: #fff;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      white-space: nowrap;
+      line-height: 1.2;
+    }
+    .live-bar-pointer::after {
+      content: "";
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid var(--ink);
+    }
+
+    /* Markers placed directly along the bar */
+    .bar-markers {
+      position: relative;
+      width: 100%;
+      height: 44px;
+      margin-top: 2px;
+    }
+    .bar-tick {
+      position: absolute;
+      top: 0;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .bar-tick.align-left {
+      transform: translateX(0%);
+      align-items: flex-start;
+      text-align: left;
+    }
+    .bar-tick.align-right {
+      transform: translateX(-100%);
+      align-items: flex-end;
+      text-align: right;
+    }
+    .tick-line {
+      width: 1.5px;
+      height: 6px;
+      background: var(--ink-secondary);
+      margin-bottom: 3px;
+    }
+    .tick-val {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.71rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.15;
+    }
+    .tick-desc {
+      font-size: 0.69rem;
+      color: var(--muted);
+      font-weight: 500;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    /* Controls & Booktabs Table */
+    .controls-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .btn {
+      background: var(--primary);
+      color: #ffffff;
+      border: 1px solid var(--primary);
+      padding: 9px 14px;
+      border-radius: 5px;
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      text-align: center;
+      text-decoration: none;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .btn:hover { background: #0c3b66; }
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: var(--surface-subtle);
+      border-color: #94a3b8;
+    }
+
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .telemetry-cell {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 8px 10px;
+    }
+    .telemetry-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .telemetry-val {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-top: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .panel-box {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      padding: 14px;
+      border-radius: 6px;
+    }
+    .panel-box label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.81rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .table-caption {
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .booktabs-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+      font-variant-numeric: tabular-nums;
+      border-top: 2px solid var(--rule-heavy);
+      border-bottom: 2px solid var(--rule-heavy);
+    }
+    .booktabs-table thead th {
+      padding: 6px 5px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--ink);
+      border-bottom: 1px solid var(--ink-secondary);
+    }
+    .booktabs-table tbody td {
+      padding: 6px 5px;
+      color: var(--ink-secondary);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .booktabs-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .method-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .tab-btn {
+      background: var(--surface);
+      color: var(--ink-secondary);
+      border: 1px solid var(--border);
+      padding: 6px 11px;
+      border-radius: 4px;
+      font-size: 0.77rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+    .tab-btn:hover {
+      background: var(--surface-subtle);
+      color: var(--ink);
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    pre {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 6px;
+      padding: 16px 18px;
+      overflow-x: auto;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.8rem;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="venue-tag">NeurIPS 2026 Workshop • Continual Learning in the Era of Foundation Models and Embodied Agents</div>
+    <h1>Trajectory-Modulated Landscape Navigation (TMLN)<br/>Decoupling Stability from Rigidity in Continual Learning</h1>
+    <div class="authors">
+       <a class="btn btn-lg" href="mailto:isabelle.aguilar@sydney.edu.au" style="background-color: #10b981; color: white; padding: 14px 30px; font-size: 1.25rem; font-weight: 700; border-radius: 4px; text-decoration: none;">EMAIL: isabelle.aguilar@sydney.edu.au</a>
+    </div>
+    <div class="affiliation" style="font-size: 1.2rem; font-weight: 700">School of Biomedical Engineering, The University of Sydney</div>
+    <div class="equation-banner">
+      <span class="math">θ<sub>t+1</sub> = θ<sub>t</sub> − η · ∇L(θ<sub>t</sub>) / (F + λ1 + γS̄)</span>
+      <span class="metrics">1.07× SGD Throughput &nbsp;•&nbsp; Strict O(N) Linear Memory</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- SECTION I: LOSS LANDSCAPE NAVIGATION -->
+  <div class="card">
+    <div class="section-header">
+      <h2><span class="section-num">I.</span> INTERACTIVE FIGURE 2: Loss Landscape Navigation Under "Fog"</h2>
+      <span class="section-meta">Parameter Subspace Projection (u, v)</span>
+    </div>
+
+    <!-- Prominent, High-Visibility Instruction & Control Bar at Top of Figure -->
+    <div class="instruction-header" id="instructionHeader">
+      <div class="instruction-steps">
+        <div class="instruction-kicker" id="instructionKicker">Interactive Experiment • Two-Stage Sequential Training</div>
+        <div class="instruction-text" id="phaseBanner">
+          <strong>How to use:</strong> Click <strong>"START"</strong>, then drag the blue parameter marker <strong>θ</strong> on the plot (or use arrow keys).
+        </div>
+        <div class="instruction-sub" id="instructionSub">
+          <strong>Stage 1 (6s):</strong> Converge to Task 1 minimum θ₁ (0, 0). &nbsp;|&nbsp;
+          <strong>Stage 2 (8s in "Task 1 Fog"):</strong> Task 1 contours have disappeared! Navigate towards Task 2 min without drifting onto Task 1's yellow high-forgetting cliff.
+        </div>
+      </div>
+      <div class="instruction-actions">
+        <button class="btn" id="startGameBtn">▶ START</button>
+        <button class="btn btn-secondary" id="revealBtn">Show Optimizer Trajectories</button>
+      </div>
+    </div>
+
+    <div class="game-layout">
+      <div class="stage-column">
+        <div class="canvas-wrap">
+          <canvas id="valleyCanvas" width="680" height="468"></canvas>
+        </div>
+
+        <!-- Clean Colorbar with Tick Markers Placed Directly Along the Bar -->
+        <div class="colorbar-card">
+          <div class="colorbar-header">
+            <span id="colorbarTitleText">Task 1 Loss Surface <em>L</em><sub>1</sub>(θ) &amp; Curvature Regime</span>
+            <span id="colorbarStatusText" style="font-family:'JetBrains Mono',monospace; color:var(--primary);">Current: Flat Valley (Low Forgetting)</span>
+          </div>
+
+          <div class="colorbar-track-wrap">
+            <!-- Dynamic pointer tracking current player parameter θ along the loss bar -->
+            <div class="live-bar-pointer" id="liveBarPointer" style="left: 12%;">
+              <span id="liveBarLabel">θ: 1.9</span>
+            </div>
+            <div class="viridis-bar"></div>
+
+            <!-- Markers positioned directly along the bar -->
+            <div class="bar-markers">
+              <div class="bar-tick align-left" style="left: 0%;">
+                <div class="tick-line"></div>
+                <div class="tick-val">L = 1.1</div>
+                <div class="tick-desc"><strong>Low Forgetting</strong><br>(Flat Basin)</div>
+              </div>
+
+              <div class="bar-tick" style="left: 33%;">
+                <div class="tick-line"></div>
+                <div class="tick-val">L = 4.5</div>
+                <div class="tick-desc">Mild Forgetting</div>
+              </div>
+
+              <div class="bar-tick" style="left: 66%;">
+                <div class="tick-line"></div>
+                <div class="tick-val">L = 12.5</div>
+                <div class="tick-desc">High Forgetting</div>
+              </div>
+
+              <div class="bar-tick align-right" style="left: 100%;">
+                <div class="tick-line"></div>
+                <div class="tick-val">L ≥ 25.0</div>
+                  <div class="tick-desc"><strong>Severe Forgetting</strong><br>(Steep Cliff)</div>
+<!--                <div class="tick-desc"><strong>Severe Forgetting</strong> (Steep Cliff)</div>-->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-panel">
+        <!-- Live Telemetry Readout -->
+        <div class="telemetry-grid">
+          <div class="telemetry-cell">
+            <div class="telemetry-label">Phase</div>
+            <div class="telemetry-val" id="hudTask">IDLE</div>
+          </div>
+          <div class="telemetry-cell">
+            <div class="telemetry-label">Timer</div>
+            <div class="telemetry-val" id="hudTimer">0.0s</div>
+          </div>
+          <div class="telemetry-cell">
+            <div class="telemetry-label">Task 1 Loss</div>
+            <div class="telemetry-val" id="hudLoss">1.92</div>
+          </div>
+        </div>
+
+        <div class="panel-box">
+          <label>
+            <span>Trajectory Modulation Strength (γ)</span>
+            <span id="gammaValLabel" style="color:var(--primary); font-family:'JetBrains Mono',monospace;">1.0</span>
+          </label>
+          <input type="range" id="gammaSlider" min="0" max="3" step="0.1" value="1.0" />
+          <p style="font-size:0.75rem; color:var(--muted); margin-top:6px; line-height:1.45;">
+            Adjusting <strong>γ</strong> scales the path integral <em>S̄</em> in the denominator <code>(F + λ1 + γS̄)</code>, deflecting TMLN away from the bright-yellow steep cliff and keeping it inside the dark-purple low-forgetting valley.
+          </p>
+        </div>
+
+        <div class="panel-box" style="background:var(--surface);">
+          <div class="table-caption">Table 5: Convergence Metrics at Task 2 End</div>
+          <table class="booktabs-table">
+            <thead>
+              <tr>
+                <th>Optimizer</th>
+                <th>Task 1 L₁ ↓</th>
+                <th>Task 2 L₂ ↓</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="dot" style="background:#ef4444"></span>Naive SGD</td>
+                <td>24.57</td>
+                <td>6.39</td>
+                <td>1.00×</td>
+              </tr>
+              <tr>
+                <td><span class="dot" style="background:#f59e0b"></span>ER (Replay)</td>
+                <td>22.53</td>
+                <td>5.28</td>
+                <td>1.04×</td>
+              </tr>
+              <tr>
+                <td><span class="dot" style="background:#a855f7"></span>EWC++</td>
+                <td>14.20</td>
+                <td>9.85 (Rigid)</td>
+                <td>1.34×</td>
+              </tr>
+              <tr style="background:#f0fdf4; font-weight:600; color:#065f46;">
+                <td style="color:inherit;"><span class="dot" style="background:#10b981"></span>TMLN (Ours)</td>
+                <td style="color:inherit;">9.07</td>
+                <td style="color:inherit;">1.10</td>
+                <td style="color:inherit;">1.07×</td>
+              </tr>
+              <tr id="playerRow" style="background:#eff6ff; font-weight:600; color:#1d4ed8;">
+                <td style="color:inherit;"><span class="dot" style="background:#3b82f6"></span>You</td>
+                <td id="pLoss1" style="color:inherit;">--</td>
+                <td id="pLoss2" style="color:inherit;">--</td>
+                <td id="pVerdict" style="color:inherit;">Pending</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION II: PARETO FRONTIER (FIG 3 & TABLE 6) -->
+  <div class="card">
+    <div class="section-header">
+      <h2><span class="section-num">II.</span> INTERACTIVE FIGURE 3: Stability–Plasticity Pareto Frontier</h2>
+      <span class="section-meta">Split CIFAR-10 Hyperparameter Sensitivity Sweep (Table 6)</span>
+    </div>
+
+    <div class="game-layout">
+      <div class="canvas-wrap" style="aspect-ratio: 16 / 10; background: #ffffff; border-color: var(--border);">
+        <canvas id="paretoCanvas" width="680" height="425"></canvas>
+      </div>
+
+      <div class="controls-panel">
+        <div style="font-size:0.82rem; color:var(--ink-secondary); line-height:1.5;">
+          <strong>Experimental Analysis:</strong> Select a continual learning method below and sweep its primary regularization hyperparameter to observe the trade-off between <em>Forgetting Measure (FM)</em> and <em>Intransigence (INT)</em>.
+        </div>
+
+        <div class="method-tabs" id="methodTabs">
+          <button class="tab-btn active" data-method="EWC++">EWC++ (λ)</button>
+          <button class="tab-btn" data-method="ER">ER (Buffer B)</button>
+          <button class="tab-btn" data-method="RWalk">RWalk (λ)</button>
+          <button class="tab-btn" data-method="Naive">Naive (η)</button>
+          <button class="tab-btn" data-method="OCAR">OCAR (τ)</button>
+          <button class="tab-btn" data-method="TMLN">TMLN (γ, Ours)</button>
+        </div>
+
+        <div class="panel-box">
+          <label>
+            <span id="paramNameLabel">EWC++: λ = 1000</span>
+            <span id="accBadge" style="color:var(--primary); font-family:'JetBrains Mono',monospace;">ACC: 17.45%</span>
+          </label>
+          <input type="range" id="paretoSlider" min="0" max="4" step="1" value="2" />
+        </div>
+
+        <div id="paretoReadout" class="panel-box" style="background:var(--surface); font-size:0.82rem;">
+          <div style="display:flex; justify-content:space-between; padding-bottom:8px; border-bottom:1px solid var(--border-light);">
+            <span><strong>Forgetting (FM ↓):</strong> <span id="fmVal" style="font-family:'JetBrains Mono',monospace;">83.31%</span></span>
+            <span><strong>Intransigence (INT ↓):</strong> <span id="intVal" style="font-family:'JetBrains Mono',monospace;">9.54%</span></span>
+          </div>
+          <p id="paretoInsight" style="margin-top:8px; color:var(--ink-secondary); font-size:0.79rem; line-height:1.5;">
+            Increasing EWC++ regularization λ reduces forgetting modestly (89.8% → 73.4%), but induces severe parameter rigidity, elevating Intransigence to 21.59%.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION III: PYTORCH IMPLEMENTATION -->
+  <div class="card">
+    <div class="section-header">
+      <h2><span class="section-num">III.</span> Reference Implementation &amp; Qwen2.5 LoRA Post-Training</h2>
+      <span class="section-meta">Drop-in replacement for torch.optim.SGD</span>
+    </div>
+    <p style="font-size:0.88rem; color:var(--ink-secondary); margin-bottom:14px; max-width:900px;">
+      By formulating continual learning as element-wise inverse preconditioning using a diagonal Empirical Fisher (<em>F</em>) and normalized trajectory accumulator (<em>S̄</em>), TMLN maintains strict <em>O(N)</em> memory complexity. This enables scalable Foundation Model LoRA fine-tuning where Kronecker-factored methods such as K-FAC (<em>O(N²)</em>, 16.86× slower) become computationally prohibitive.
+    </p>
+    <pre><code>from tmln_optim import TMLNOptimizer
+
+# 1. Initialize as a drop-in replacement for standard torch.optim.SGD
+optimizer = TMLNOptimizer(model.parameters(), lr=0.01, lambda_base=0.1, gamma=1.0)
+
+# 2. Standard optimization step: applies inverse preconditioning (F + lambda + gamma * S_bar)^(-1)
+loss.backward()
+optimizer.step()
+
+# 3. Consolidate parameter trajectory &amp; update empirical Fisher at task boundaries
+optimizer.end_task(model, replay_buffer_batches)</code></pre>
+
+    <div class="footer-links">
+      <a class="btn" href="https://colab.research.google.com/drive/18tmTiup6ENQNuIbgcc79qEu76exbKkAf?usp=sharing" target="_blank">Open Qwen2.5 LoRA Colab Notebook</a>
+<!--      <a class="btn btn-secondary" href="mailto:isabelle.aguilar@sydney.edu.au">Correspondence: isabelle.aguilar@sydney.edu.au</a>-->
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================================
+// SECTION I: SCIENTIFIC LOSS LANDSCAPE FIGURE (FIGURE 2 & TABLE 5)
+// ============================================================================
+const vCanvas = document.getElementById('valleyCanvas');
+const vCtx = vCanvas.getContext('2d');
+
+// Matplotlib-style plot margins inside valleyCanvas so axes & ticks are crisp
+const PLOT_PAD = { left: 52, right: 18, top: 18, bottom: 42 };
+const PLOT_W = vCanvas.width - PLOT_PAD.left - PLOT_PAD.right;
+const PLOT_H = vCanvas.height - PLOT_PAD.top - PLOT_PAD.bottom;
+
+// Coordinate domain matching Figure 2: u in [-15, 15], v in [-2, 22]
+const U_MIN = -15, U_MAX = 15;
+const V_MIN = -2,  V_MAX = 22;
+
+function uvToXY(u, v) {
+  const x = PLOT_PAD.left + ((u - U_MIN) / (U_MAX - U_MIN)) * PLOT_W;
+  const y = PLOT_PAD.top + PLOT_H - ((v - V_MIN) / (V_MAX - V_MIN)) * PLOT_H;
+  return [x, y];
+}
+function xyToUV(x, y) {
+  const u = U_MIN + ((x - PLOT_PAD.left) / PLOT_W) * (U_MAX - U_MIN);
+  const v = V_MIN + ((PLOT_PAD.top + PLOT_H - y) / PLOT_H) * (V_MAX - V_MIN);
+  return [u, v];
+}
+
+function task1Loss(u, v) {
+  // Low-forgetting curved valley centerline sits around u in [0, 3.6]
+  const uValley = 3.5 * Math.sin(v * 0.105);
+  const distFromValley = u - uValley;
+  // Graduated curvature: flat purple valley -> teal/green transition slopes -> bright yellow cliff at u >= 11
+  const rightCliffAsymmetry = distFromValley > 0 ? 1.25 : 0.95;
+  const cliff = 0.135 * distFromValley * distFromValley * rightCliffAsymmetry * (1 + 0.028 * Math.max(0, v));
+  const vDrift = 0.012 * Math.pow(Math.max(0, v), 1.5);
+  return 1.10 + cliff + vDrift;
+}
+
+function task2Loss(u, v) {
+  // THE TRAP: Unconstrained Task 2 global minimum sits at (u = 12.2, v = 18.5) on Task 1's steep cliff!
+  // Broad anisotropic basin produces wide teal and emerald/lime-green slopes across the center of the plot.
+  const du = (u - 12.2);
+  const dv = (v - 18.5);
+  return 1.10 + 0.022 * du * du + 0.028 * dv * dv - 0.008 * du * dv;
+}
+
+// Convert loss L in [1.1, 25.0] to normalized [0, 1] position matching colorbar ticks:
+// L=1.1 -> 0%, L=4.5 -> 33%, L=12.5 -> 66%, L=25.0 -> 100%
+function lossToNorm(l) {
+  const clamped = Math.min(25.0, Math.max(1.1, l));
+  return Math.pow((clamped - 1.1) / (25.0 - 1.1), 0.56);
+}
+
+// Exact 6-stop Viridis piecewise linear interpolation matching CSS .viridis-bar
+const VIRIDIS_STOPS = [
+  [0.00, [68,  1,   84]],  // #440154 Deep Purple (Flat Basin, L = 1.1)
+  [0.20, [59,  82,  139]], // #3b528b Indigo Blue
+  [0.40, [33,  145, 140]], // #21918c Teal (Basin Wall, L ~ 4.5)
+  [0.60, [42,  176, 127]], // #2ab07f Emerald Green (Transition Slope)
+  [0.80, [122, 209, 81]],  // #7ad151 Lime Green (Steepening Slope)
+  [1.00, [253, 231, 37]]   // #fde725 Bright Yellow (Steep Cliff, L >= 25)
+];
+
+function colorMapViridis(t) {
+  t = Math.max(0, Math.min(1, t));
+  for (let i = 0; i < VIRIDIS_STOPS.length - 1; i++) {
+    const [t0, c0] = VIRIDIS_STOPS[i];
+    const [t1, c1] = VIRIDIS_STOPS[i + 1];
+    if (t >= t0 && t <= t1) {
+      const f = (t - t0) / (t1 - t0);
+      return [
+        Math.round(c0[0] + f * (c1[0] - c0[0])),
+        Math.round(c0[1] + f * (c1[1] - c0[1])),
+        Math.round(c0[2] + f * (c1[2] - c0[2]))
+      ];
+    }
+  }
+  return VIRIDIS_STOPS[VIRIDIS_STOPS.length - 1][1];
+}
+
+// Pre-render full-resolution scientific heatmaps with crisp iso-contours
+const offscreenT1 = document.createElement('canvas');
+const offscreenFog = document.createElement('canvas');
+offscreenT1.width = offscreenFog.width = PLOT_W;
+offscreenT1.height = offscreenFog.height = PLOT_H;
+
+function bakeHeatmaps() {
+  const ctx1 = offscreenT1.getContext('2d');
+  const ctx2 = offscreenFog.getContext('2d');
+  const img1 = ctx1.createImageData(PLOT_W, PLOT_H);
+  const img2 = ctx2.createImageData(PLOT_W, PLOT_H);
+
+  // Contour levels aligned with colorbar ticks (2.5, 4.5, 8.0, 12.5, 18.0, 24.0)
+  const levels = [2.5, 4.5, 8.0, 12.5, 18.0, 24.0];
+
+  for (let py = 0; py < PLOT_H; py++) {
+    for (let px = 0; px < PLOT_W; px++) {
+      const u = U_MIN + (px / PLOT_W) * (U_MAX - U_MIN);
+      const v = V_MIN + ((PLOT_H - py) / PLOT_H) * (V_MAX - V_MIN);
+
+      const l1 = task1Loss(u, v);
+      const l2 = task2Loss(u, v);
+
+      const t1Norm = lossToNorm(l1);
+      let [r1, g1, b1] = colorMapViridis(t1Norm);
+
+      const uRight = U_MIN + ((px + 1) / PLOT_W) * (U_MAX - U_MIN);
+      const vDown  = V_MIN + ((PLOT_H - (py + 1)) / PLOT_H) * (V_MAX - V_MIN);
+      const l1Right = task1Loss(uRight, v);
+      const l1Down  = task1Loss(u, vDown);
+
+      for (let k = 0; k < levels.length; k++) {
+        const lv = levels[k];
+        if ((l1 < lv && l1Right >= lv) || (l1 >= lv && l1Right < lv) ||
+            (l1 < lv && l1Down >= lv)  || (l1 >= lv && l1Down < lv)) {
+          r1 = Math.round(r1 * 0.68 + 255 * 0.32);
+          g1 = Math.round(g1 * 0.68 + 255 * 0.32);
+          b1 = Math.round(b1 * 0.68 + 255 * 0.32);
+          break;
+        }
+      }
+
+      // In Fog of War, render Task 2's deceptive basin centered at (12.2, 18.5) with rich teal/green slopes
+      const t2Norm = lossToNorm(l2);
+      let [r2, g2, b2] = colorMapViridis(t2Norm);
+      const l2Right = task2Loss(uRight, v);
+      const l2Down  = task2Loss(u, vDown);
+
+      for (let k = 0; k < levels.length; k++) {
+        const lv = levels[k];
+        if ((l2 < lv && l2Right >= lv) || (l2 >= lv && l2Right < lv) ||
+            (l2 < lv && l2Down >= lv)  || (l2 >= lv && l2Down < lv)) {
+          r2 = Math.round(r2 * 0.68 + 255 * 0.32);
+          g2 = Math.round(g2 * 0.68 + 255 * 0.32);
+          b2 = Math.round(b2 * 0.68 + 255 * 0.32);
+          break;
+        }
+      }
+
+      const idx = (py * PLOT_W + px) * 4;
+      img1.data[idx] = r1; img1.data[idx+1] = g1; img1.data[idx+2] = b1; img1.data[idx+3] = 255;
+      img2.data[idx] = r2; img2.data[idx+1] = g2; img2.data[idx+2] = b2; img2.data[idx+3] = 255;
+    }
+  }
+  ctx1.putImageData(img1, 0, 0);
+  ctx2.putImageData(img2, 0, 0);
+}
+bakeHeatmaps();
+
+// Simulation State
+let gameState = 'IDLE'; // IDLE, TASK1, TASK2, REVEAL
+let timer = 0;
+let lastTime = performance.now();
+let playerUV = [-10.0, 0.0];
+let playerTrail = [[-10.0, 0.0]];
+let pointerTargetUV = null;
+let animProgress = 1.0;
+
+const keys = {};
+window.addEventListener('keydown', e => {
+  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key) &&
+      (gameState === 'TASK1' || gameState === 'TASK2')) {
+    e.preventDefault();
+  }
+  keys[e.key] = true;
+});
+window.addEventListener('keyup', e => { keys[e.key] = false; });
+
+function handlePointer(e) {
+  const rect = vCanvas.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  const x = ((clientX - rect.left) / rect.width) * vCanvas.width;
+  const y = ((clientY - rect.top) / rect.height) * vCanvas.height;
+  pointerTargetUV = xyToUV(x, y);
+}
+vCanvas.addEventListener('pointerdown', e => { handlePointer(e); });
+vCanvas.addEventListener('pointermove', e => { if (e.buttons > 0 || e.touches) handlePointer(e); });
+vCanvas.addEventListener('pointerup', () => { pointerTargetUV = null; });
+
+function setInstructionState(mode, evalSummary = null) {
+  const header = document.getElementById('instructionHeader');
+  const kicker = document.getElementById('instructionKicker');
+  const banner = document.getElementById('phaseBanner');
+  const sub    = document.getElementById('instructionSub');
+
+  header.className = 'instruction-header';
+  if (mode === 'TASK1') {
+    header.classList.add('state-task1');
+    kicker.textContent = 'STAGE 1 • Task 1 Training';
+    banner.innerHTML = '<strong>INSTRUCTIONS:</strong> Drag the blue marker <strong>θ</strong> from (-10, 0) into the white Task 1 minimum <strong>θ₁ (0, 0)</strong>.';
+    // sub.textContent = 'Notice where Task 1\'s dark-purple low-forgetting valley curves upward (around u ≈ 3.5)—you will need to remember this path in Stage 2!';
+  } else if (mode === 'TASK2') {
+    header.classList.add('state-fog');
+    kicker.textContent = 'STAGE 2 • Task 2 Training';
+    banner.innerHTML = '<strong>INSTRUCTIONS:</strong> Task 1 is now hidden! Reach an optimal point to reduce Task 2 loss without forgetting Task 1.';
+    // sub.textContent = 'Trap Warning: Unconstrained gradient descent follows the green/teal slope straight into θ₂ (12.2, 18.5), unaware that it sits on Task 1\'s yellow cliff.';
+  } else if (mode === 'REVEAL') {
+    header.classList.add('state-reveal');
+    kicker.textContent = 'Evaluation Complete • Trajectory Comparison (Figure 2)';
+    if (evalSummary) {
+      banner.innerHTML = evalSummary.banner;
+      sub.textContent  = evalSummary.sub;
+    } else {
+      banner.innerHTML = '<strong>Task 1 Surface Restored:</strong> Compare how Naive SGD and ER fall into the Task 2 cliff trap versus TMLN.';
+      sub.textContent = 'Use the γ slider on the right to observe how TMLN bends away from the yellow high-forgetting cliff into the dark-purple valley.';
+    }
+  }
+}
+
+document.getElementById('startGameBtn').addEventListener('click', () => {
+  gameState = 'TASK1';
+  timer = 6.0;
+  playerUV = [-10.0, 0.0];
+  playerTrail = [[-10.0, 0.0]];
+  setInstructionState('TASK1');
+});
+
+document.getElementById('revealBtn').addEventListener('click', () => {
+  gameState = 'REVEAL';
+  animProgress = 0.0;
+  setInstructionState('REVEAL');
+});
+
+document.getElementById('gammaSlider').addEventListener('input', e => {
+  document.getElementById('gammaValLabel').textContent = parseFloat(e.target.value).toFixed(1);
+});
+
+function getOptimizerTrajectories(gamma) {
+  const sgd = [[-13.5, 0], [0, 0], [5.2, 12.0], [13.2, 19.2]];
+  const er  = [[-13.5, 0], [0, 0], [4.8, 12.2], [11.5, 18.0]];
+  const ewc = [[-8.0, 0],  [0, 0], [0.6, 2.2],  [1.1, 3.8]];
+  const bendU = 3.8 + (1.0 - Math.min(gamma, 2.0)) * 5.2;
+  const tmln = [[-4.0, 0], [0, 0], [2.1 + (1 - Math.min(gamma, 1.5))*1.5, 9.0], [bendU, 17.0]];
+  return { sgd, er, ewc, tmln };
+}
+
+function drawPolyline(pts, color, width, progress = 1.0, dashed = false) {
+  if (pts.length < 2) return;
+  vCtx.save();
+  vCtx.strokeStyle = color;
+  vCtx.lineWidth = width;
+  vCtx.lineCap = 'round';
+  vCtx.lineJoin = 'round';
+  if (dashed) vCtx.setLineDash([7, 5]);
+  vCtx.beginPath();
+
+  const totalSegs = pts.length - 1;
+  const maxSeg = progress * totalSegs;
+
+  for (let i = 0; i < totalSegs; i++) {
+    if (i > maxSeg) break;
+    const [x0, y0] = uvToXY(pts[i][0], pts[i][1]);
+    const [x1, y1] = uvToXY(pts[i+1][0], pts[i+1][1]);
+    if (i === 0) vCtx.moveTo(x0, y0);
+    const segFrac = Math.min(1, maxSeg - i);
+    vCtx.lineTo(x0 + (x1 - x0) * segFrac, y0 + (y1 - y0) * segFrac);
+  }
+  vCtx.stroke();
+  vCtx.restore();
+}
+
+function drawAxesAndFrame() {
+  vCtx.fillStyle = '#ffffff';
+  vCtx.fillRect(0, 0, vCanvas.width, PLOT_PAD.top);
+  vCtx.fillRect(0, PLOT_PAD.top + PLOT_H, vCanvas.width, PLOT_PAD.bottom);
+  vCtx.fillRect(0, 0, PLOT_PAD.left, vCanvas.height);
+  vCtx.fillRect(PLOT_PAD.left + PLOT_W, 0, PLOT_PAD.right, vCanvas.height);
+
+  vCtx.strokeStyle = '#334155';
+  vCtx.lineWidth = 1;
+  vCtx.strokeRect(PLOT_PAD.left, PLOT_PAD.top, PLOT_W, PLOT_H);
+
+  vCtx.fillStyle = '#475569';
+  vCtx.font = '10.5px JetBrains Mono, monospace';
+  vCtx.textAlign = 'center';
+  for (let u = -15; u <= 15; u += 5) {
+    const [x, ] = uvToXY(u, 0);
+    vCtx.beginPath();
+    vCtx.moveTo(x, PLOT_PAD.top + PLOT_H);
+    vCtx.lineTo(x, PLOT_PAD.top + PLOT_H + 4);
+    vCtx.stroke();
+    vCtx.fillText(u.toString(), x, PLOT_PAD.top + PLOT_H + 16);
+  }
+
+  vCtx.textAlign = 'right';
+  for (let v = 0; v <= 20; v += 5) {
+    const [, y] = uvToXY(0, v);
+    vCtx.beginPath();
+    vCtx.moveTo(PLOT_PAD.left - 4, y);
+    vCtx.lineTo(PLOT_PAD.left, y);
+    vCtx.stroke();
+    vCtx.fillText(v.toString(), PLOT_PAD.left - 8, y + 3.5);
+  }
+
+  vCtx.fillStyle = '#0f172a';
+  vCtx.font = '600 11.5px Source Serif 4, Georgia, serif';
+  vCtx.textAlign = 'center';
+  vCtx.fillText('Parameter Subspace Direction u', PLOT_PAD.left + PLOT_W / 2, vCanvas.height - 6);
+
+  vCtx.save();
+  vCtx.translate(14, PLOT_PAD.top + PLOT_H / 2);
+  vCtx.rotate(-Math.PI / 2);
+  vCtx.fillText('Parameter Subspace Direction v', 0, 0);
+  vCtx.restore();
+}
+
+function drawSubtleSurfaceLabels(isFog) {
+  vCtx.save();
+  if (!isFog) {
+    // Subtle centerline along the low-forgetting valley floor
+    vCtx.strokeStyle = 'rgba(167, 243, 208, 0.35)';
+    vCtx.lineWidth = 1.25;
+    vCtx.setLineDash([4, 6]);
+    vCtx.beginPath();
+    for (let v = -1; v <= 21; v += 0.5) {
+      const uVal = 3.5 * Math.sin(v * 0.105);
+      const [x, y] = uvToXY(uVal, v);
+      if (v === -1) vCtx.moveTo(x, y);
+      else vCtx.lineTo(x, y);
+    }
+    vCtx.stroke();
+    vCtx.setLineDash([]);
+
+    vCtx.font = '600 10px Inter, sans-serif';
+    vCtx.fillStyle = 'rgba(15, 23, 42, 0.65)';
+    vCtx.textAlign = 'left';
+    const [lx, ly] = uvToXY(-14.2, 20.5);
+    vCtx.fillText('STEEP CLIFF (L₁ > 20)', lx, ly);
+
+    vCtx.textAlign = 'right';
+    const [rx, ry] = uvToXY(14.2, 4.5);
+    vCtx.fillText('STEEP CLIFF (L₁ > 20)', rx, ry);
+  }
+  vCtx.restore();
+}
+
+function drawMarker(u, v, color, label, align = 'right') {
+  const [x, y] = uvToXY(u, v);
+  vCtx.save();
+  vCtx.fillStyle = color;
+  vCtx.strokeStyle = '#0f172a';
+  vCtx.lineWidth = 2;
+  vCtx.beginPath();
+  vCtx.arc(x, y, 5.5, 0, Math.PI * 2);
+  vCtx.fill();
+  vCtx.stroke();
+
+  if (label) {
+    vCtx.font = '600 10.5px Inter, sans-serif';
+    const textW = vCtx.measureText(label).width;
+    const padX = 6, boxH = 18;
+    const rightLimit = PLOT_PAD.left + PLOT_W - 6;
+    const goLeft = (align === 'left') || (x + 10 + textW + padX * 2 > rightLimit);
+    const boxX = goLeft ? (x - 9 - textW - padX * 2) : (x + 9);
+    const boxY = y - boxH / 2;
+
+    vCtx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+    vCtx.strokeStyle = color;
+    vCtx.lineWidth = 1;
+    vCtx.beginPath();
+    vCtx.roundRect(boxX, boxY, textW + padX * 2, boxH, 3);
+    vCtx.fill();
+    vCtx.stroke();
+
+    vCtx.fillStyle = '#f8fafc';
+    vCtx.textAlign = 'left';
+    vCtx.textBaseline = 'middle';
+    vCtx.fillText(label, boxX + padX, y + 0.5);
+  }
+  vCtx.restore();
+}
+
+function updateColorbarPointer(l1, l2, isFog) {
+  const ptr = document.getElementById('liveBarPointer');
+  const lbl = document.getElementById('liveBarLabel');
+  const titleEl = document.getElementById('colorbarTitleText');
+  const status = document.getElementById('colorbarStatusText');
+
+  if (isFog) {
+    // During Fog of War, track θ along the visible Task 2 surface L2(θ) on the colorbar
+    titleEl.innerHTML = 'Visible Surface: Task 2 Loss <em>L</em><sub>2</sub>(θ) &nbsp;(Task 1 <em>L</em><sub>1</sub> Hidden)';
+    const pct2 = Math.max(2, Math.min(98, lossToNorm(l2) * 100));
+    ptr.style.left = `${pct2.toFixed(1)}%`;
+    lbl.textContent = `θ: L₂=${l2.toFixed(1)}`;
+    status.textContent = 'Fog of War: Task 1 Curvature Unobserved';
+    status.style.color = '#b45309';
+    return;
+  }
+
+  titleEl.innerHTML = 'Task 1 Loss Surface <em>L</em><sub>1</sub>(θ) &amp; Curvature Regime';
+  const pct = Math.max(2, Math.min(98, lossToNorm(l1) * 100));
+  ptr.style.left = `${pct.toFixed(1)}%`;
+  lbl.textContent = `θ: L₁=${l1.toFixed(1)}`;
+
+  if (l1 < 3.5) {
+    status.textContent = 'Current Regime: Low-Forgetting Flat Basin (Purple/Blue)';
+    status.style.color = '#065f46';
+  } else if (l1 < 14.0) {
+    status.textContent = 'Current Regime: Moderate Transition Slope (Teal/Green)';
+    status.style.color = '#0d9488';
+  } else {
+    status.textContent = 'Current Regime: High-Forgetting Steep Cliff (Yellow)';
+    status.style.color = '#b91c1c';
+  }
+}
+
+function gameLoop(now) {
+  const dt = Math.min(0.05, (now - lastTime) / 1000);
+  lastTime = now;
+
+  if (gameState === 'TASK1' || gameState === 'TASK2') {
+    timer -= dt;
+    const speed = 11.0;
+    let du = 0, dv = 0;
+    if (keys['ArrowLeft'] || keys['a']) du -= 1;
+    if (keys['ArrowRight'] || keys['d']) du += 1;
+    if (keys['ArrowUp'] || keys['w']) dv += 1;
+    if (keys['ArrowDown'] || keys['s']) dv -= 1;
+
+    if (pointerTargetUV) {
+      const dx = pointerTargetUV[0] - playerUV[0];
+      const dy = pointerTargetUV[1] - playerUV[1];
+      const dist = Math.hypot(dx, dy);
+      if (dist > 0.3) { du = dx / dist; dv = dy / dist; }
+    }
+
+    if (du !== 0 || dv !== 0) {
+      playerUV[0] = Math.max(U_MIN + 0.8, Math.min(U_MAX - 0.8, playerUV[0] + du * speed * dt));
+      playerUV[1] = Math.max(V_MIN + 0.8, Math.min(V_MAX - 0.8, playerUV[1] + dv * speed * dt));
+      playerTrail.push([playerUV[0], playerUV[1]]);
+    }
+
+    if (gameState === 'TASK1' && (Math.hypot(playerUV[0] - 0, playerUV[1] - 0) < 1.4 || timer <= 0)) {
+      gameState = 'TASK2';
+      timer = 8.0;
+      setInstructionState('TASK2');
+    } else if (gameState === 'TASK2' && timer <= 0) {
+      gameState = 'REVEAL';
+      animProgress = 0.0;
+      const l1 = task1Loss(playerUV[0], playerUV[1]);
+      const l2 = task2Loss(playerUV[0], playerUV[1]);
+      document.getElementById('pLoss1').textContent = l1.toFixed(2);
+      document.getElementById('pLoss2').textContent = l2.toFixed(2);
+
+      const pRow = document.getElementById('playerRow');
+      let verdictText = '';
+      let evalSummary = null;
+
+      if (l1 >= 8.5) {
+        verdictText = 'Catastrophic Forgetting';
+        evalSummary = {
+          banner: `<strong style="color:#b91c1c;">Catastrophic Forgetting Trap Triggered (L₁ = ${l1.toFixed(2)}, L₂ = ${l2.toFixed(2)}):</strong><br> Following Task 2's basin toward θ₂ pulled your parameters onto Task 1's steep cliff!`,
+          sub: 'Without historical trajectory preconditioning (γS̄), gradient descent is blind to Task 1\'s cliff walls during Task 2 optimization.'
+        };
+      } else if (playerUV[1] < 12.0) {
+        verdictText = 'High Intransigence';
+        evalSummary = {
+          banner: `<strong style="color:#6d28d9;">High Intransigence / Rigidity (L₁ = ${l1.toFixed(2)}, L₂ = ${l2.toFixed(2)}):</strong><br>Remaining near θ₁ preserved Task 1, but failed to reduce Task 2 loss.`,
+          sub: 'To achieve Pareto optimality, the optimizer must travel upward along the narrow dark-purple valley channel around u ≈ 3.5.'
+        };
+      } else {
+        verdictText = 'Pareto-Optimal';
+        evalSummary = {
+          banner: `<strong style="color:#065f46;">Pareto-Optimal Navigation (L₁ = ${l1.toFixed(2)}, L₂ = ${l2.toFixed(2)}):</strong><br> You resisted the deceptive Task 2 Minimum trap on the right and stayed inside Task 1's low-forgetting valley!`,
+          sub: 'TMLN automates this geometry via inverse preconditioning (F + λ1 + γS̄)⁻¹, deflecting updates along the valley floor.'
+        };
+      }
+
+      document.getElementById('pVerdict').textContent = verdictText;
+      setInstructionState('REVEAL', evalSummary);
+    }
+  }
+
+  if (gameState === 'REVEAL' && animProgress < 1.0) {
+    animProgress = Math.min(1.0, animProgress + dt * 0.45);
+  }
+
+  const isFog = (gameState === 'TASK2');
+
+  vCtx.save();
+  vCtx.beginPath();
+  vCtx.rect(PLOT_PAD.left, PLOT_PAD.top, PLOT_W, PLOT_H);
+  vCtx.clip();
+
+  vCtx.drawImage(isFog ? offscreenFog : offscreenT1, PLOT_PAD.left, PLOT_PAD.top, PLOT_W, PLOT_H);
+
+  // Subtle internal grid lines
+  vCtx.strokeStyle = 'rgba(255,255,255,0.10)';
+  vCtx.lineWidth = 1;
+  for (let u = -10; u <= 10; u += 5) {
+    const [x, ] = uvToXY(u, 0);
+    vCtx.beginPath(); vCtx.moveTo(x, PLOT_PAD.top); vCtx.lineTo(x, PLOT_PAD.top + PLOT_H); vCtx.stroke();
+  }
+  for (let v = 0; v <= 20; v += 5) {
+    const [, y] = uvToXY(0, v);
+    vCtx.beginPath(); vCtx.moveTo(PLOT_PAD.left, y); vCtx.lineTo(PLOT_PAD.left + PLOT_W, y); vCtx.stroke();
+  }
+
+  if (gameState !== 'IDLE') {
+    drawSubtleSurfaceLabels(isFog);
+  }
+
+  // Task 1 Minimum Anchor shown during active Task 1 training or Reveal (IDLE shows only the user marker)
+  if (gameState === 'TASK1' || gameState === 'REVEAL') {
+    drawMarker(0, 0, '#ffffff', 'θ₁ (Task 1 Min)');
+  }
+  if (isFog) {
+    drawMarker(12.2, 18.5, '#facc15', 'θ₂ (Task 2 Min)', 'left');
+  }
+
+  const gamma = parseFloat(document.getElementById('gammaSlider').value);
+  if (gameState === 'REVEAL') {
+    const { sgd, er, ewc, tmln } = getOptimizerTrajectories(gamma);
+    drawPolyline(sgd,  '#ef4444', 3.0, animProgress);
+    drawPolyline(er,   '#f59e0b', 3.0, animProgress, true);
+    drawPolyline(ewc,  '#a855f7', 3.0, animProgress);
+    drawPolyline(tmln, '#10b981', 3.8, animProgress);
+
+    if (animProgress > 0.95) {
+      drawMarker(sgd[3][0],  sgd[3][1],  '#ef4444', 'Naive SGD (L₁=24.57)', 'left');
+      drawMarker(er[3][0],   er[3][1],   '#f59e0b', 'ER (L₁=22.53)', 'left');
+      drawMarker(ewc[3][0],  ewc[3][1],  '#a855f7', 'EWC++ (Rigid)', 'right');
+      drawMarker(tmln[3][0], tmln[3][1], '#10b981', 'TMLN (L₁=9.07)', 'left');
+    }
+  }
+
+  if (playerTrail.length > 1) {
+    drawPolyline(playerTrail, '#3b82f6', 3.0, 1.0);
+  }
+  drawMarker(playerUV[0], playerUV[1], '#3b82f6', 'You');
+
+  vCtx.restore();
+
+  drawAxesAndFrame();
+
+  document.getElementById('hudTask').textContent = gameState;
+  document.getElementById('hudTimer').textContent = `${Math.max(0, timer).toFixed(1)}s`;
+  const curL1 = task1Loss(playerUV[0], playerUV[1]);
+  const curL2 = task2Loss(playerUV[0], playerUV[1]);
+  document.getElementById('hudLoss').textContent = isFog ? 'Hidden' : curL1.toFixed(2);
+  updateColorbarPointer(curL1, curL2, isFog);
+
+  requestAnimationFrame(gameLoop);
+}
+requestAnimationFrame(gameLoop);
+
+
+// ============================================================================
+// SECTION II: PARETO FRONTIER EXPLORER (EXACT DATA FROM TABLE 6, PAGE 15)
+// ============================================================================
+const paretoData = {
+  "EWC++": {
+    color: "#dc2626",
+    insight: "Increasing EWC++ regularization λ reduces forgetting modestly (89.8% → 73.4%), but induces severe parameter rigidity, elevating Intransigence to 21.59%.",
+    configs: [
+      { label: "λ = 100",   acc: 18.63, fm: 0.8976, int: 0.0183 },
+      { label: "λ = 500",   acc: 18.41, fm: 0.8812, int: 0.0378 },
+      { label: "λ = 1000",  acc: 17.45, fm: 0.8331, int: 0.0954 },
+      { label: "λ = 5000",  acc: 16.39, fm: 0.7615, int: 0.1788 },
+      { label: "λ = 10000", acc: 15.66, fm: 0.7338, int: 0.2159 }
+    ]
+  },
+  "ER": {
+    color: "#16a34a",
+    insight: "Even with a 2,000-sample replay buffer, standard Experience Replay remains above 74% Forgetting on single-head Split CIFAR-10.",
+    configs: [
+      { label: "B = 100",  acc: 16.32, fm: 0.6760, int: 0.2449 },
+      { label: "B = 200",  acc: 19.39, fm: 0.8203, int: 0.0756 },
+      { label: "B = 500",  acc: 18.90, fm: 0.8573, int: 0.0508 },
+      { label: "B = 1000", acc: 18.20, fm: 0.8048, int: 0.1012 },
+      { label: "B = 2000", acc: 28.35, fm: 0.7415, int: 0.0444 }
+    ]
+  },
+  "RWalk": {
+    color: "#ca8a04",
+    insight: "RWalk combines Fisher information and path integral as an additive penalty, improving over EWC++ but plateauing above 58% Forgetting.",
+    configs: [
+      { label: "λ = 100",   acc: 39.46, fm: 0.6156, int: 0.0388 },
+      { label: "λ = 500",   acc: 38.75, fm: 0.6109, int: 0.0531 },
+      { label: "λ = 1000",  acc: 34.94, fm: 0.6565, int: 0.0547 },
+      { label: "λ = 5000",  acc: 32.42, fm: 0.6122, int: 0.1300 },
+      { label: "λ = 10000", acc: 30.28, fm: 0.5841, int: 0.1826 }
+    ]
+  },
+  "Naive": {
+    color: "#2563eb",
+    insight: "Unregularized SGD exhibits high plasticity (near-zero intransigence) at the cost of severe catastrophic forgetting (~90%).",
+    configs: [
+      { label: "η = 0.001", acc: 19.04, fm: 0.9215, int: -0.0155 },
+      { label: "η = 0.005", acc: 19.18, fm: 0.9128, int: -0.0074 },
+      { label: "η = 0.01",  acc: 19.04, fm: 0.8989, int: 0.0000 },
+      { label: "η = 0.05",  acc: 16.78, fm: 0.8677, int: 0.0509 },
+      { label: "η = 0.1",   acc: 12.14, fm: 0.8400, int: 0.1392 }
+    ]
+  },
+  "OCAR": {
+    color: "#db2777",
+    insight: "OCAR employs Kronecker-factored (K-FAC) second-order curvature matrices (16.86× slower than SGD), yet incurs 20–30% Intransigence on sequential single-head tasks.",
+    configs: [
+      { label: "τ = 1e-4", acc: 14.34, fm: 0.7335, int: 0.2073 },
+      { label: "τ = 1e-3", acc: 13.45, fm: 0.6849, int: 0.2650 },
+      { label: "τ = 1e-2", acc: 13.69, fm: 0.6228, int: 0.2628 },
+      { label: "τ = 1",    acc: 14.71, fm: 0.7295, int: 0.2075 },
+      { label: "τ = 10",   acc: 13.85, fm: 0.6226, int: 0.3020 }
+    ]
+  },
+  "TMLN": {
+    color: "#0f4c81",
+    insight: "By modulating step sizes via the denominator (F + λ1 + γS̄), TMLN decouples stability from rigidity—shifting the Pareto frontier into the optimal region (51.55% ACC).",
+    configs: [
+      { label: "γ = 0.01", acc: 47.11, fm: 0.3634, int: 0.1949 },
+      { label: "γ = 0.1",  acc: 46.49, fm: 0.4632, int: 0.0970 },
+      { label: "γ = 1.0 (Optimal)", acc: 51.55, fm: 0.4032, int: 0.0994 },
+      { label: "γ = 10",   acc: 48.44, fm: 0.4388, int: 0.0913 },
+      { label: "γ = 100",  acc: 40.91, fm: 0.5318, int: 0.0733 }
+    ]
+  }
+};
+
+let activeMethod = "EWC++";
+let activeIdx = 2;
+const pCanvas = document.getElementById('paretoCanvas');
+const pCtx = pCanvas.getContext('2d');
+
+function drawParetoPlot() {
+  pCtx.fillStyle = '#ffffff';
+  pCtx.fillRect(0, 0, pCanvas.width, pCanvas.height);
+
+  const padL = 66, padR = 28, padT = 26, padB = 48;
+  const W = pCanvas.width - padL - padR;
+  const H = pCanvas.height - padT - padB;
+
+  const fmToX = fm => padL + (fm / 1.0) * W;
+  const intToY = intVal => padT + H - ((intVal + 0.05) / 0.38) * H;
+
+  pCtx.strokeStyle = '#e2e8f0';
+  pCtx.lineWidth = 1;
+  for (let f = 0; f <= 1.0; f += 0.2) {
+    const x = fmToX(f);
+    pCtx.beginPath(); pCtx.moveTo(x, padT); pCtx.lineTo(x, padT + H); pCtx.stroke();
+    pCtx.fillStyle = '#475569'; pCtx.font = '11px JetBrains Mono, monospace';
+    pCtx.fillText(f.toFixed(1), x - 10, padT + H + 18);
+  }
+  for (let i = -0.05; i <= 0.31; i += 0.05) {
+    const y = intToY(i);
+    pCtx.beginPath(); pCtx.moveTo(padL, y); pCtx.lineTo(padL + W, y); pCtx.stroke();
+    pCtx.fillStyle = '#475569'; pCtx.font = '11px JetBrains Mono, monospace';
+    pCtx.fillText(i.toFixed(2), 18, y + 4);
+  }
+
+  pCtx.strokeStyle = '#334155';
+  pCtx.lineWidth = 1;
+  pCtx.strokeRect(padL, padT, W, H);
+
+  const optX = fmToX(0.03), optY = intToY(0.13);
+  const optW = fmToX(0.50) - optX, optH = intToY(-0.03) - optY;
+  pCtx.fillStyle = 'rgba(13, 148, 136, 0.08)';
+  pCtx.strokeStyle = '#0d9488';
+  pCtx.lineWidth = 1.5;
+  pCtx.setLineDash([5, 4]);
+  pCtx.strokeRect(optX, optY, optW, optH);
+  pCtx.fillRect(optX, optY, optW, optH);
+  pCtx.setLineDash([]);
+
+  pCtx.fillStyle = '#0f766e';
+  pCtx.font = '600 11.5px Inter, sans-serif';
+  pCtx.fillText('Optimal Pareto Region (Low Forgetting & Low Intransigence)', optX + 10, optY + optH - 10);
+
+  for (const [mName, mObj] of Object.entries(paretoData)) {
+    const isSelectedMethod = (mName === activeMethod);
+
+    pCtx.save();
+    pCtx.strokeStyle = mObj.color;
+    pCtx.globalAlpha = isSelectedMethod ? 0.75 : 0.22;
+    pCtx.lineWidth = isSelectedMethod ? 2.2 : 1.2;
+    pCtx.beginPath();
+    mObj.configs.forEach((cfg, idx) => {
+      const x = fmToX(cfg.fm), y = intToY(cfg.int);
+      if (idx === 0) pCtx.moveTo(x, y);
+      else pCtx.lineTo(x, y);
+    });
+    pCtx.stroke();
+    pCtx.restore();
+
+    mObj.configs.forEach((cfg, idx) => {
+      const x = fmToX(cfg.fm);
+      const y = intToY(cfg.int);
+      const isSelectedPoint = isSelectedMethod && (idx === activeIdx);
+
+      pCtx.save();
+      pCtx.fillStyle = mObj.color;
+      pCtx.globalAlpha = isSelectedMethod ? 1.0 : 0.35;
+      pCtx.beginPath();
+      pCtx.arc(x, y, isSelectedPoint ? 7.5 : 4.5, 0, Math.PI * 2);
+      pCtx.fill();
+
+      if (isSelectedPoint) {
+        pCtx.strokeStyle = '#0f172a';
+        pCtx.lineWidth = 2;
+        pCtx.stroke();
+
+        const label = `${mName} (${cfg.label})`;
+        pCtx.font = '600 11px Inter, sans-serif';
+        const tw = pCtx.measureText(label).width;
+        const flipLeft = (x + 14 + tw > pCanvas.width - 12);
+        const lx = flipLeft ? (x - 14 - tw) : (x + 14);
+
+        pCtx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+        pCtx.strokeStyle = '#cbd5e1';
+        pCtx.lineWidth = 1;
+        pCtx.beginPath();
+        pCtx.roundRect(lx - 6, y - 11, tw + 12, 21, 4);
+        pCtx.fill();
+        pCtx.stroke();
+
+        pCtx.fillStyle = '#0f172a';
+        pCtx.fillText(label, lx, y + 3.5);
+      }
+      pCtx.restore();
+    });
+  }
+
+  pCtx.fillStyle = '#0f172a';
+  pCtx.font = '600 12px Source Serif 4, Georgia, serif';
+  pCtx.fillText('Forgetting Measure (FM) ↓', padL + W / 2 - 68, pCanvas.height - 10);
+
+  pCtx.save();
+  pCtx.translate(14, padT + H / 2 + 55);
+  pCtx.rotate(-Math.PI / 2);
+  pCtx.fillText('Intransigence (INT) ↓', 0, 0);
+  pCtx.restore();
+}
+
+function updateParetoUI() {
+  const mObj = paretoData[activeMethod];
+  const cfg = mObj.configs[activeIdx];
+  document.getElementById('paramNameLabel').textContent = `${activeMethod}: ${cfg.label}`;
+  document.getElementById('accBadge').textContent = `ACC: ${cfg.acc.toFixed(2)}%`;
+  document.getElementById('fmVal').textContent = `${(cfg.fm * 100).toFixed(2)}%`;
+  document.getElementById('intVal').textContent = `${(cfg.int * 100).toFixed(2)}%`;
+  document.getElementById('paretoInsight').textContent = mObj.insight;
+  drawParetoPlot();
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeMethod = btn.dataset.method;
+    activeIdx = 2;
+    document.getElementById('paretoSlider').value = 2;
+    updateParetoUI();
+  });
+});
+
+document.getElementById('paretoSlider').addEventListener('input', e => {
+  activeIdx = parseInt(e.target.value, 10);
+  updateParetoUI();
+});
+
+updateParetoUI();
+</script>
+</body>
+</html>
